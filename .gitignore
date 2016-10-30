@@ -1,0 +1,16 @@
+.idea/
+.vs/
+.vscode/
+.sass-cache/
+4iterr.log
+prepros.cfg
+config.json
+4it.njsproj
+node_modules/
+public/.sass-cache/
+4it.json
+public/5748ba693d1eaf39218b456f.txt
+scripts/RU.txt
+scripts/allCountries.txt
+scripts/readme.txt
+scripts/timeZones.txt
