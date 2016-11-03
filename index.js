@@ -28,19 +28,23 @@ db.set('lastStart', Date.now()).value();
 const bot = new TelegramBot(config.TGtoken, {polling: true});
 
 bot.on('message', function(msg){
-	console.log(msg);
+	function sendInstructions(){
+		logger.debug('wrong message', msg.text);
+		bot.sendMessage(msg.from.id, '/new <название>{0,32} - добавить оповещение\n/all - показать созданные оповещения\n/delete <token> - удалить оповещение');
+	}
 	if (msg.entities !== undefined && msg.entities[0].type === 'bot_command'){
 		var command = msg.text.substr(msg.entities[0].offset, msg.entities[0].length);
 		if (command === '/new'){
 			var name = msg.text.substr(msg.entities[0].length).trim();
+			logger.debug('TM /new', (msg.from.username || msg.from.id), name);
 			if (name.length>2 && name.length<32){
-				logger.info('TM /new', (msg.from.username || msg.from.id), ': '+name);
 				var newToken = crypto.randomBytes(8).toString('hex');
 				db.get('notificators').push({
 					user: msg.from.id,
 					name: name,
 					token: newToken
 				}).value();
+				logger.info('TM /new succesful', (msg.from.username || msg.from.id), name);
 				bot.sendMessage(msg.from.id, 'Оповещение добавлено.\nuser: '+msg.from.id+'\nname: '+name+'\ntoken: '+newToken);
 			}
 			else{
@@ -50,9 +54,26 @@ bot.on('message', function(msg){
 		}
 		else if (command === '/all'){
 			logger.debug('TM /all', (msg.from.username || msg.from.id));
-			var notificators = db.get('notificators').find({user: msg.from.id}).value();
-			bot.sendMessage(msg.from.id, 'Список оповещений:\n'+JSON.stringify(notificators));
+			var notificators = db.get('notificators').filter({user: msg.from.id}).value();
+			bot.sendMessage(msg.from.id, 'Список оповещений:\n'+JSON.stringify(notificators, null, 2));
 		}
+		else if (command === '/delete'){
+			arg = msg.text.substr(msg.entities[0].length).trim();
+			logger.debug('TM /delete', (msg.from.username || msg.from.id), arg);
+			if (arg.length >2 && arg.length<32){
+				console.log('deleting',db.get('notificators').remove({user: msg.from.id, token: arg}).value());
+				bot.sendMessage(msg.from.id, 'Список оповещений:\n'+JSON.stringify(db.get('notificators').filter({user: msg.from.id}).value(), null, 2));
+			}
+			else{
+				sendInstructions();
+			}
+		}
+		else{
+			sendInstructions();
+		}
+	}
+	else{
+		sendInstructions();
 	}
 });
 
