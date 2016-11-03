@@ -5,6 +5,7 @@ const express = require('express');
 const winston = require('winston');
 const TelegramBot = require('node-telegram-bot-api');
 const lowdb = require('lowdb');
+const fileAsync = require('lowdb/lib/file-async')
 const config = require('./config.json');
 
 const logger = new winston.Logger({
@@ -18,7 +19,9 @@ const logger = new winston.Logger({
     ]
 });
 
-const db = lowdb('TGM.json');
+const db = lowdb('TGM.json',{
+	storage: fileAsync
+});
 db.defaults({
 	'notificators': []
 }).value();
