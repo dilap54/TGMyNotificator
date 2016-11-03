@@ -20,7 +20,7 @@ const logger = new winston.Logger({
 });
 
 const db = lowdb('TGM.json',{
-	storage: fileAsync
+	//storage: fileAsync
 });
 db.defaults({
 	'notificators': []
@@ -64,8 +64,14 @@ bot.on('message', function(msg){
 			arg = msg.text.substr(msg.entities[0].length).trim();
 			logger.debug('TM /delete', (msg.from.username || msg.from.id), arg);
 			if (arg.length >2 && arg.length<32){
-				console.log('deleting',db.get('notificators').remove({user: msg.from.id, token: arg}).value());
-				bot.sendMessage(msg.from.id, 'Список оповещений:\n'+JSON.stringify(db.get('notificators').filter({user: msg.from.id}).value(), null, 2));
+				var deleted = db.get('notificators').remove({user: msg.from.id, token: arg}).value();
+				if (deleted.length>0){
+					bot.sendMessage(msg.from.id, '"'+deleted[0].name+'" успешно удален');
+				}
+				else{
+					bot.sendMessage(msg.from.id, 'Ничего не удалено');
+				}
+				
 			}
 			else{
 				sendInstructions();
