@@ -101,8 +101,8 @@ app.all('/:token', function(req, res){
 			if (req.query.t){
 				text = req.query.t;
 			}
-			bot.sendMessage(item.user, item.name+' Notice:\n'+text);
-			logger.info('Notice:', item.user, item.name+'\n'+text)
+			bot.sendMessage('['+item.user, item.name+']: '+text);
+			logger.info('Notice:', item.user, item.name, text)
 			res.end();
 		}
 		else{
