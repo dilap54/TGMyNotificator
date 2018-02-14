@@ -35,7 +35,10 @@ bot.on('message', function(msg){
 		logger.debug('wrong message', msg.text);
 		bot.sendMessage(msg.chat.id, '/new <название>{0,32} - добавить оповещение\n/all - показать созданные оповещения\n/delete <token> - удалить оповещение');
 	}
-	if (msg.entities !== undefined && msg.entities[0].type === 'bot_command'){
+	if (msg.entities === undefined || msg.entities[0].type !== 'bot_command'){
+		sendInstructions();
+		return;
+	}
 		var command = msg.text.substr(msg.entities[0].offset, msg.entities[0].length);
 		if (command === '/new'){
 			var name = msg.text.substr(msg.entities[0].length).trim();
@@ -80,10 +83,6 @@ bot.on('message', function(msg){
 		else{
 			sendInstructions();
 		}
-	}
-	else{
-		sendInstructions();
-	}
 });
 
 
